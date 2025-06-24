@@ -35,10 +35,15 @@ BASE_URI = 'https://pi.pardot.com'
 
 
 class PardotAPI(object):
-    def __init__(self, email, password, user_key, version=4):
-        self.email = email
-        self.password = password
-        self.user_key = user_key
+    def __init__(self, client_id, client_secret, domain, business_unit_id, version=4): #email, password, user_key, version=4):
+        self.email = None
+        self.password = None
+        self.user_key = None
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.domain = domain
+        self.business_unit_id = business_unit_id
+        self.access_token = None
         self.api_key = None
         self.version = version
         self.accounts = Accounts(self)
@@ -70,6 +75,8 @@ class PardotAPI(object):
         invalid, one re-authentication request is made, in case the key has simply expired. If no errors are raised,
         returns either the JSON response, or if no JSON was returned, returns the HTTP response status code.
         """
+        # unsupported exception:
+        raise Exception('POST requests are not supported')
         if params is None:
             params = {}
         params.update({'user_key': self.user_key, 'api_key': self.api_key, 'format': 'json'})
@@ -115,7 +122,7 @@ class PardotAPI(object):
         if retries != 0:
             raise err
         self.api_key = None
-        if self.authenticate():
+        if self.authenticate_sp():
             response = getattr(self, method)(object_name=object_name, path=path, params=params, retries=1)
             return response
         else:
@@ -148,8 +155,8 @@ class PardotAPI(object):
     def _check_auth(self, object_name):
         if object_name == 'login':
             return
-        if self.api_key is None:
-            self.authenticate()
+        if self.access_token is None:
+            self.authenticate_sp()
 
     def authenticate(self):
         """
@@ -168,11 +175,48 @@ class PardotAPI(object):
         except PardotAPIError:
             return False
 
+
+    def authenticate_sp(self):
+        """Authenticate with Pardot API v5 using OAuth 2.0"""
+
+        # URL for the Salesforce OAuth token endpoint
+        url = f'https://{self.domain}/services/oauth2/token'
+
+        # Prepare the payload for the POST request
+        payload = {
+            'grant_type': 'client_credentials',
+            'client_id': f'{self.client_id}',
+            'client_secret': self.client_secret
+        }
+
+        # Make the POST request to obtain the bearer token
+        response = requests.post(url, data=payload)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            # Extract the bearer token from the response
+            auth_response = response.json()
+            self.access_token = auth_response.get('access_token')
+            if self.access_token:
+                print(f"Authentication successful!")
+                return True
+            else:
+                print("Authentication failed: No access token received")
+                return False
+        else:
+            print("Error obtaining bearer token:", response.status_code, response.text)
+            return False
+
+
     def _build_auth_header(self):
         """
         Builds Pardot Authorization Header to be used with GET requests
         """
-        if not self.user_key or not self.api_key:
+        if not self.client_id or not self.client_secret or not self.domain:
             raise Exception('Cannot build Authorization header. user or api key is empty')
-        auth_string = 'Pardot api_key=%s, user_key=%s' % (self.api_key, self.user_key)
-        return {'Authorization': auth_string}
+        if not self.access_token:
+            self.authenticate_sp()
+
+        return {'Authorization': f'Bearer {self.access_token}',
+                'Pardot-Business-Unit-Id': self.business_unit_id
+            }
