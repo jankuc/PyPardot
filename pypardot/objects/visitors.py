@@ -15,7 +15,12 @@ class Visitors(object):
         response = self._get(path='/do/query', params=kwargs)
 
         # Ensure result['visitor'] is a list, no matter what.
-        result = response.get('result')
+        try:
+            result = response.get('result')
+        except: 
+            print('response: ')
+            print(response)
+            raise PardotAPIError(json_response=response)
         if 'output' not in kwargs.keys() and 'bulk' not in kwargs.values():
             if result['total_results'] == 0:
                 result['visitor'] = []
