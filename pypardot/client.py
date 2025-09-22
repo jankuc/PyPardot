@@ -218,5 +218,6 @@ class PardotAPI(object):
             self.authenticate_sp()
 
         return {'Authorization': f'Bearer {self.access_token}',
-                'Pardot-Business-Unit-Id': self.business_unit_id
+                'Pardot-Business-Unit-Id': self.business_unit_id,
+                'Accept': 'application/json'
             }
