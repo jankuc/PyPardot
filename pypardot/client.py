@@ -150,6 +150,10 @@ class PardotAPI(object):
                 raise PardotAPIError(json_response=json)
             return json
         else:
+            print('Non-JSON response received:')
+            print("response.text: ", response.text)
+            print("response.status_code: ", response.status_code)
+            print("response.headers: ", response.headers)
             return response.status_code
 
     def _check_auth(self, object_name):

@@ -18,7 +18,8 @@ class Visitors(object):
         try:
             result = response.get('result')
         except: 
-            print('response: ')
+            # Response is only a status code, not JSON:
+            print('response code: ')
             print(response)
             raise PardotAPIError(json_response=response)
         if 'output' not in kwargs.keys() and 'bulk' not in kwargs.values():
