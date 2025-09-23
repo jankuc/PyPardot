@@ -143,9 +143,18 @@ class PardotAPI(object):
         Raises PardotAPIError if an error was found. If no error was found, returns the JSON. If JSON was not found,
         returns the response status code.
         """
+        
+        try:
+            print("response.text: ", response.text)
+            print("response.status_code: ", response.status_code)
+            print("response.headers: ", response.headers)
+            print("response.json: ", response.json())
+        except Exception as e:
+            print("Error while printing response details: ", str(e))
+        
         if response.headers.get('content-type') == 'application/json':
             json = response.json()
-            error = json.get('err')
+            error = json.get('err') 
             if error:
                 raise PardotAPIError(json_response=json)
             return json
