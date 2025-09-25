@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="PyPardot4",
-    version="1.1.17",
+    version="1.1.18",
     author="Matt Needham",
     author_email="matthew.m.needham@gmail.com",
 	license="MIT",
