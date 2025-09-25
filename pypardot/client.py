@@ -148,6 +148,7 @@ class PardotAPI(object):
             json = response.json()
             error = json.get('err') 
             if error:
+                print('error in json: ', str(error))
                 raise PardotAPIError(json_response=json)
             return json
         else:
