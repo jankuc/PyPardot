@@ -144,14 +144,6 @@ class PardotAPI(object):
         returns the response status code.
         """
         
-        try:
-            print("response.text: ", response.text)
-            print("response.status_code: ", response.status_code)
-            print("response.headers: ", response.headers)
-            print("response.json: ", response.json())
-        except Exception as e:
-            print("Error while printing response details: ", str(e))
-        
         if response.headers.get('content-type') == 'application/json':
             json = response.json()
             error = json.get('err') 
