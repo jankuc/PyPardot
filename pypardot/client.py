@@ -37,7 +37,7 @@ BASE_URI = 'https://pi.pardot.com'
 
 
 class PardotAPI(object):
-    def __init__(self, client_id, client_secret, domain, business_unit_id, version=4): #email, password, user_key, version=4):
+    def __init__(self, client_id, client_secret, domain, business_unit_id, access_token_timeout_seconds=5*60, version=4): #email, password, user_key, version=4):
         self.email = None
         self.password = None
         self.user_key = None
@@ -47,7 +47,7 @@ class PardotAPI(object):
         self.business_unit_id = business_unit_id
         self.access_token = None
         self.access_token_created_at = None
-        self.access_token_timeout_seconds = 5 * 60
+        self.access_token_timeout_seconds = access_token_timeout_seconds
         self.api_key = None
         self.version = version
         self.accounts = Accounts(self)
