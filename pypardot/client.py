@@ -207,6 +207,7 @@ class PardotAPI(object):
         if response.status_code == 200:
             # Extract the bearer token from the response
             auth_response = response.json()
+            print("auth_response: ", auth_response )
             self.access_token = auth_response.get('access_token')
             self.access_token_created_at = datetime.datetime.now()
             if self.access_token:
