@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 from .objects.accounts import Accounts
 from .objects.customfields import CustomFields
@@ -44,6 +46,7 @@ class PardotAPI(object):
         self.domain = domain
         self.business_unit_id = business_unit_id
         self.access_token = None
+        self.access_token_created_at = None
         self.api_key = None
         self.version = version
         self.accounts = Accounts(self)
@@ -159,9 +162,10 @@ class PardotAPI(object):
             return response.status_code
 
     def _check_auth(self, object_name):
+        token_created_interval = datetime.datetime.now() - self.access_token_created_at
         if object_name == 'login':
             return
-        if self.access_token is None:
+        if self.access_token is None or token_created_interval.total_seconds() > 5 * 60:
             self.authenticate_sp()
 
     def authenticate(self):
@@ -203,6 +207,7 @@ class PardotAPI(object):
             # Extract the bearer token from the response
             auth_response = response.json()
             self.access_token = auth_response.get('access_token')
+            self.access_token_created_at = datetime.datetime.now()
             if self.access_token:
                 print(f"Authentication successful!")
                 return True
