@@ -47,6 +47,7 @@ class PardotAPI(object):
         self.business_unit_id = business_unit_id
         self.access_token = None
         self.access_token_created_at = None
+        self.access_token_timeout_seconds = 5 * 60
         self.api_key = None
         self.version = version
         self.accounts = Accounts(self)
@@ -165,7 +166,7 @@ class PardotAPI(object):
         token_created_interval = datetime.datetime.now() - self.access_token_created_at
         if object_name == 'login':
             return
-        if self.access_token is None or token_created_interval.total_seconds() > 5 * 60:
+        if self.access_token is None or token_created_interval.total_seconds() > self.access_token_timeout_seconds:
             self.authenticate_sp()
 
     def authenticate(self):
