@@ -101,6 +101,7 @@ class PardotAPI(object):
         if params is None:
             params = {}
         params.update({'format': 'json'})
+        print(params)
         headers = self._build_auth_header()
         try:
             self._check_auth(object_name=object_name)
@@ -153,7 +154,6 @@ class PardotAPI(object):
             return json
         else:
             print('Non-JSON response received:')
-            print("response.text: ", response.text)
             print("response.status_code: ", response.status_code)
             print("response.headers: ", response.headers)
             return response.status_code
